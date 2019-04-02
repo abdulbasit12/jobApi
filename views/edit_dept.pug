@@ -1,0 +1,13 @@
+extends layout
+
+block content
+    h1 #{title}
+    form(method='POST', action='/departments/edit/'+dept._id)
+        #form-group
+            label Department ID:
+            input.form-control(type='number', min='1', max='3', name="deptId", value=dept.deptId, disabled='disabled')
+        #form-group
+            label Department Name:
+            input.form-control(name='deptname', type='text', value=dept.deptname)
+        br
+        input.btn.btn-primary(type='submit', value='Submit')

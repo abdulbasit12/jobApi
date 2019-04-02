@@ -1,0 +1,12 @@
+extends layout
+
+block content
+    h1= dept.deptname
+    table.table.table-bordered
+        tbody
+            tr
+                th Department ID
+                td= dept.deptId
+    if user
+        a.btn.btn-primary(href='/departments/edit/'+dept._id) Edit
+        a.btn.btn-danger.pull-right.delete-dept(href='#',data-id=dept._id) Delete

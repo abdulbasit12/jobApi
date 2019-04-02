@@ -1,0 +1,36 @@
+//- extends layout
+
+//- block content
+//-     h1= user.name
+//-     table.table.table-bordered
+//-         tbody
+//-             tr
+//-                 th Email
+//-                 td= user.email
+//-             tr
+//-                 th User Name
+//-                 td= user.username
+//-             tr
+//-                 th Gender
+//-                 td= user.gender
+//-             tr
+//-                 th Phone
+//-                 td= user.phone
+//-             tr
+//-                 th Profession
+//-                 td= user.profession
+
+//-     br
+//-     h3 #{job_created}
+//-     each cj, i in createdjobs
+//-         if user.name == cj.creatername
+//-             ul.list-group
+//-                 li.list-group-item
+//-                     a(href="/jobs/"+cj._id)= cj.jobname
+//-     br
+//-     h3 #{task}
+//-     each t, i in createdjobs
+//-         if user.name == t.workername
+//-             ul.list-group
+//-                 li.list-group-item
+//-                     a(href="/jobs/"+t._id)= t.jobname

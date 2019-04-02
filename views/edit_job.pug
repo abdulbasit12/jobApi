@@ -1,0 +1,40 @@
+extends layout
+
+block content
+    h1 #{title}
+    form(method='POST', action='/jobs/edit/'+job._id)
+        //- .form-group
+        //-     label Job Name:
+        //-     input.form-control(name='jobname', type='text', value=job.jobname)
+        //- .form-group
+        //-     label Department ID:
+        //-     input.form-control(name='departmentId', type='text', value=job.departmentId, readonly='readonly')
+        //- .form-group
+        //-     label Building:
+        //-     input.form-control(name='building', type='text', value=job.building)
+        //- .form-group
+        //-     label Floor:
+        //-     input.form-control(name='floor', type='number', value=job.floor)
+        //- .form-group
+        //-     label Room:
+        //-     input.form-control(name='room', type='number', value=job.room)
+        //- .form-group
+        //-     label Specific Instruction:
+        //-     input.form-control(name='instructions', type='text', value=job.instructions)
+        //- .form-group
+        //-     label Priority:
+        //-     input.form-control(name='priority', type='text', value=job.priority)
+        //- .form-group
+        //-     label Deadline:
+        //-     input.form-control(name='deadline', type='date', value=job.deadline)
+        .form-group
+            label File Status:
+            input.form-control(name='filestatus', type='text', value=job.filestatus)
+        //- .form-group
+        //-     label Creater Name:
+        //-     input.form-control(name='createrId', type='text', value=job.creatername, readonly='readonly')
+        //- .form-group
+        //-     label Worker Name:
+        //-     input.form-control(name='workerId', type='text', value=job.workername)
+        br
+        input.btn.btn-primary(type='submit', value='Submit')

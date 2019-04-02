@@ -1,0 +1,13 @@
+extends layout
+
+block content
+    h1 #{title}
+    form(method='POST', action='/feedbacks/add')
+        #form-group
+            label User Name:
+            input.form-control(type='text', name="username", value=user.name, readonly='readonly')
+        #form-group
+            label Feedback:
+            textarea.form-control(name='feedback')
+        br
+        input.btn.btn-primary(type='submit', value='Submit')

@@ -1,0 +1,52 @@
+doctype html
+html
+    head
+        title App
+        link(rel='stylesheet' href='/bower_components/bootstrap/dist/css/bootstrap.css')
+        link(rel='stylesheet' href='/css/style.css')
+        link(rel='json' href='manifest.json')
+    body
+        nav.navbar.navbar-expand-md.navbar-dark.bg-dark
+            a.navbar-brand(href='#') Node Express
+            button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarsExampleDefault', aria-controls='navbarsExampleDefault', aria-expanded='false', aria-label='Toggle navigation')
+                span.navbar-toggler-icon
+            #navbarsExampleDefault.collapse.navbar-collapse
+                ul.navbar-nav.mr-auto
+                    li.nav-item
+                        a.nav-link(href='/')| Home
+                    if user
+                        //- li.nav-item
+                        //-     a.nav-link(href='/articles/add') Add Articles
+                        li.nav-item
+                            a.nav-link(href='/jobs/job') Add Job
+                        li.nav-item
+                            a.nav-link(href='/departments/add') Add Department
+                        li.nav-item
+                            a.nav-link(href='/feedbacks/add') Feedback
+                ul.navbar-nav.ml-auto
+                    if user
+                        li.nav-item.mr-2
+                            a(href='/users/'+user._id)= user.name
+                        li.nav-item
+                            a(href='/users/logout') Logout
+                    else
+                        li.nav-item
+                            a.nav-link(href='/users/register') Register
+                        li.nav-item
+                            a.nav-link(href='/users/login') Login
+        .container
+            != messages('message', locals)
+            if errors
+                each error, i in errors
+                    div(class="alert alert-danger") #{error.msg}
+            block content
+            br 
+            hr
+            footer
+                p Copyright &copy, 2019
+        
+        script(src='https://www.gstatic.com/firebasejs/5.8.3/firebase-app.js')
+        script(src='https://www.gstatic.com/firebasejs/5.8.3/firebase-messaging.js')
+        script(src='/bower_components/jquery/dist/jquery.js')
+        script(src='/bower_components/bootstrap/dist/js/bootstrap.js')
+        script(src='/js/main.js')

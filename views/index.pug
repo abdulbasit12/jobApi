@@ -1,0 +1,16 @@
+extends layout
+
+block content
+    if jobs != null
+        h1 #{title}
+        ul.list-group
+            each job, i in jobs
+                li.list-group-item
+                    a(href="/jobs/"+job._id)= job.jobname
+    if dept != null
+        br
+        h1 #{title_dept}
+        ul.list-group
+            each a, i in dept
+                li.list-group-item
+                    a(href="/departments/"+a._id)= a.deptname

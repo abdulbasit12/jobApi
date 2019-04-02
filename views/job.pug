@@ -1,0 +1,40 @@
+extends layout
+
+block content
+    h1= jobs.jobname
+    table.table.table-bordered
+        tbody
+            tr
+                th Dept ID
+                td= jobs.departmentId
+            tr
+                th Building
+                td= jobs.building
+            tr
+                th Floor
+                td= jobs.floor
+            tr
+                th Room
+                td= jobs.room
+            tr
+                th Instructions
+                td= jobs.instructions
+            tr
+                th Priority
+                td= jobs.priority
+            tr
+                th DeadLine
+                td= jobs.deadline
+            tr
+                th File Status
+                td= jobs.filestatus
+            tr
+                th Creater ID
+                td= jobs.creatername
+            tr
+                th Worker ID
+                td= jobs.workername
+    br
+    if user
+        a.btn.btn-primary(href='/jobs/edit/'+jobs._id) Edit
+        a.btn.btn-danger.pull-right.delete-job(href='#',data-id=jobs._id) Delete
