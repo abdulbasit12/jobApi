@@ -192,13 +192,24 @@ router.get('/', (req, res) => {
                     callback();
                 }
             })
+        },
+        (callback) => {
+            Job.find({}, (err, otherJob) => {
+                if(err){
+                    res.send(err)
+                } else {
+                    var open = lodash.filter(otherJob, x => x.filestatus === 'started' || x.filestatus === 'accepted')
+                    locals.open = open;
+                    callback();
+                }
+            })
         }
     ];
     async.parallel(jobStatus, (err) => {
         if (err) {
             res.send(err)
         } else {
-            res.send({ pending: locals.pending , completed: locals.completed })
+            res.send({ pending: locals.pending , completed: locals.completed, open: locals.open })
         }
     })
 })
