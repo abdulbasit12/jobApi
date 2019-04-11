@@ -8,10 +8,9 @@ const expressValidator = require('express-validator');
 const flash = require('connect-flash');
 const session = require('express-session');
 const passport = require('passport');
-const config = require('./config/database');
-const async = require('async');
-const firebase = require('firebase-tools');
-const webpush = require('web-push');
+const config = require('./config/database')
+const async = require('async')
+
 
 
 //mongodb connection
@@ -31,7 +30,19 @@ db.on('error', function (err) {
 // Init App
 const app = express();
 
+//Allow access
 app.use(cors())
+
+//static folder
+app.use(express.static('./public'))
+
+
+
+
+
+app.get('/push', () => {
+    
+})
 
 //Bring in Model
 let Article = require('./models/article');

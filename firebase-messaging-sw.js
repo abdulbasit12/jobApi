@@ -1,27 +1,21 @@
 importScripts('https://www.gstatic.com/firebasejs/4.8.1/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/4.8.1/firebase-messaging.js');
 
-// // Initialize Firebase
-// var configpush = {
-//     apiKey: "AIzaSyAtVsLawVSjNFcIFaZGDcN0ccf_769WhzM",
-//     authDomain: "expressproject-3953c.firebaseapp.com",
-//     databaseURL: "https://expressproject-3953c.firebaseio.com",
-//     projectId: "expressproject-3953c",
-//     storageBucket: "expressproject-3953c.appspot.com",
-//     messagingSenderId: "341946518193"
-// };
+var FireConfig = {
+    apiKey: "AIzaSyDWEofeVuRxaZk_732VHAMDY5P9r5BqkJc",
+    authDomain: "jobapi-ae2a1.firebaseapp.com",
+    databaseURL: "https://jobapi-ae2a1.firebaseio.com",
+    projectId: "jobapi-ae2a1",
+    storageBucket: "jobapi-ae2a1.appspot.com",
+    messagingSenderId: "587389137332"
+};
+firebase.initializeApp(FireConfig);
 
-// firebase.initializeApp(configpush);
-// const messaging = firebase.messaging();
-
-// messaging.setBackgroundMessageHandler(function(payload){
-//     const title = 'hello world';
-//     const options = {
-//         body: payload.data.status
-//     };
-//     return self.registration.showNotification(title, options);
-// });
-firebase.initializeApp({
-    messagingSenderId: "your messagingSenderId again"
-});
-const messaging = firebase.messaging();
+var messaging = firebase.messaging();
+messaging.requestPermission()
+    .then(function () {
+        console.log('have permission');
+    })
+    .catch(function (err) {
+        console.log('Error Occured');
+    })

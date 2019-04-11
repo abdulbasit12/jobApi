@@ -121,7 +121,7 @@ router.delete('/:id', (req, res) => {
 
 //Login Process
 router.post('/login', function(req, res, next){
-    passport.authenticate('local', (err, user, info) => {
+    passport.authenticate('local', (err, user) => {
         if(err) {
             return next(err);
         }
