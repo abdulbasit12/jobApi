@@ -21,20 +21,36 @@ const storage = multer.diskStorage({
 })
 
 //Init Upload
-// const upload = multer({
-//     storage : storage
-// }).single('myImage');
+const upload = multer({
+    storage : storage,
+    limits: {fileSize: 1000000},
+    fileFilter: (req, file, callback) => {
+        checkFileType(file, callback)
+    }
+}).single('myImage');
 
-// router.post('/upload', (req, res) => {
-//     upload(req, res, (err) => {
-//         if(err){
-//             res.send(err)
-//         } else {
-//             console.log(req.file);
-//             res.send({message: 'test'});
-//         }
-//     })
-// })
+checkFileType = (file, callback) => {
+    const fileType = /jpeg|jpg|png|gif/;
+    const extname = fileType.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = fileType.test(file.mimetype);
+    if(mimetype && extname){
+        return callback(null, true)
+    } else {
+        callback('Error: Images Only!')
+    }
+}
+
+router.post('/upload', (req, res) => {
+    upload(req, res, (err) => {
+        if(err){
+            res.send(err)
+        } else if(req.file == undefined){
+            res.send({message: 'select image'});
+        } else{
+            res.send({message: 'success', file : `uploads/${req.file.filename}`})
+        }
+    })
+})
 
 //Init Firebase
 firebase.initializeApp({

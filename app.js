@@ -1,15 +1,14 @@
 const express = require('express');
 var cors = require('cors');
-const jwt = require('jsonwebtoken');
 const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const expressValidator = require('express-validator');
-const flash = require('connect-flash');
 const session = require('express-session');
 const passport = require('passport');
 const config = require('./config/database')
 const async = require('async')
+const lodash = require('lodash');
 
 
 
@@ -41,7 +40,7 @@ app.use(express.static('./public'))
 
 
 app.get('/push', () => {
-    
+
 })
 
 //Bring in Model
@@ -49,6 +48,7 @@ let Article = require('./models/article');
 let Job = require('./models/job');
 let Department = require('./models/department');
 let User = require('./models/user');
+let Feedback = require('./models/feedback');
 
 // Load View Engine
 // app.engine('html', consolidate.swig);
@@ -111,22 +111,46 @@ app.get('*', function (req, res, next) {
 app.get('/', function (req, res, next) {
     var locals = [];
     var tasks = [
-        function (callback) {
+        (callback) => {
             Job.find({}, function (err, jobs) {
                 if (err) {
                     res.send(err);
                 } else {
+                    var pending = lodash.filter(jobs, x => x.filestatus === 'pending')
+                    var completed = lodash.filter(jobs, x => x.filestatus === 'completed')
                     locals.jobs = jobs;
+                    locals.pending = pending;
+                    locals.completed = completed
                     callback();
                 }
             })
         },
-        function (callback) {
+        (callback) => {
             Department.find({}, function (err, dept) {
                 if (err) {
                     res.send(err);
                 } else {
                     locals.dept = dept;
+                    callback();
+                }
+            })
+        },
+        (callback) => {
+            User.find({}, (err, user) => {
+                if (err) {
+                    res.send(err);
+                } else {
+                    locals.user = user;
+                    callback();
+                }
+            })
+        },
+        (callback) => {
+            Feedback.find({}, (err, feed) => {
+                if (err) {
+                    res.send(err)
+                } else {
+                    locals.feed = feed;
                     callback();
                 }
             })
@@ -145,6 +169,10 @@ app.get('/', function (req, res, next) {
             res.json({
                 jobs: locals.jobs,
                 dept: locals.dept,
+                user: locals.user,
+                feed: locals.feed,
+                pending: locals.pending,
+                completed: locals.completed
             })
         }
     });
