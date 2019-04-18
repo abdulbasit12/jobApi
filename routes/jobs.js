@@ -6,6 +6,7 @@ const lodash = require('lodash');
 const async = require('async');
 const firebase = require('firebase-admin')
 const serviceAccount = require('../serviceAccountKey');
+var fs = require('file-system');
 
 //Bring in Model
 let Job = require('../models/job');
@@ -40,17 +41,18 @@ checkFileType = (file, callback) => {
     }
 }
 
-router.post('/upload', (req, res) => {
-    upload(req, res, (err) => {
-        if(err){
-            res.send(err)
-        } else if(req.file == undefined){
-            res.send({message: 'select image'});
-        } else{
-            res.send({message: 'success', file : `uploads/${req.file.filename}`})
-        }
-    })
-})
+// router.post('/upload', (req, res) => {
+//     upload(req, res, (err) => {
+//         if(err){
+//             res.send(err)
+//         } else if(req.file == undefined){
+//             res.send({message: 'select image'});
+//         } else{
+//             console.log(req.file.path)
+//             res.send({message: 'success', file : `uploads/${req.file.filename}`})
+//         }
+//     })
+// })
 
 //Init Firebase
 firebase.initializeApp({
@@ -58,19 +60,19 @@ firebase.initializeApp({
     databaseURL: "https://jobapi-ae2a1.firebaseio.com"
 });
 
-router.get('/job', function (req, res) {
-    Department.find({}, function (err, dept) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.render('addjob', {
-                title: 'Create Job',
-                dept: dept,
-                // user: user
-            })
-        }
-    })
-});
+// router.get('/job', function (req, res) {
+//     Department.find({}, function (err, dept) {
+//         if (err) {
+//             res.send(err);
+//         } else {
+//             res.render('addjob', {
+//                 title: 'Create Job',
+//                 dept: dept,
+//                 // user: user
+//             })
+//         }
+//     })
+// });
 
 
 //Submit Form
@@ -94,8 +96,19 @@ router.post('/job', function (req, res) {
     //         errors: errors
     //     })
     // } else {}
+    // upload(req, res, (err) => {
+    //     if(err){
+    //         res.send(err)
+    //     } else if(req.file == undefined){
+    //         res.send({message: 'select image'});
+    //     } else{
+    //         var imgPath = req.file.path;
+    //         res.send({message: 'success', file : `uploads/${req.file.filename}`})
+    //     }
+    // })
 
     let job = new Job(req.body);
+    // Job.img.data = fs.readFileSync(imgPath)
     job.save(function (err, postedJob) {
         if (err) {
             console.log(err);
@@ -147,6 +160,7 @@ router.post('/edit/:id', function (req, res) {
             if (getJob.filestatus === 'accepted') {
                 console.log(getJob.filestatus)
                 var topic = 'job_accepted_' + JobId;
+                console.log(topic);
                 var message = {
                     notification: {
                         title: 'Job Accepted',
@@ -266,12 +280,12 @@ router.get('/:id', function (req, res) {
 })
 
 
-//view pending and completed jobs
+//view pending, completed, started, accepted, canceled jobs
 router.get('/', (req, res) => {
     var locals = [];
     var jobStatus = [
         (callback) => {
-            Job.find({}, (err, pendingJob) => {
+            Job.find({}).sort({deadline: 1}).exec((err, pendingJob) => {
                 if (err) {
                     res.send({ message: 'failed' })
                 } else {
@@ -282,7 +296,7 @@ router.get('/', (req, res) => {
             })
         },
         (callback) => {
-            Job.find({}, (err, completedJob) => {
+            Job.find({}).sort({deadline: 1}).exec((err, completedJob) => {
                 if (err) {
                     res.send(err)
                 } else {
@@ -293,7 +307,7 @@ router.get('/', (req, res) => {
             })
         },
         (callback) => {
-            Job.find({}, (err, otherJob) => {
+            Job.find({}).sort({deadline: 1}).exec((err, otherJob) => {
                 if (err) {
                     res.send(err)
                 } else {
@@ -304,7 +318,7 @@ router.get('/', (req, res) => {
             })
         },
         (callback) => {
-            Job.find({}, (err, canceled) => {
+            Job.find({}).sort({deadline: 1}).exec((err, canceled) => {
                 if (err) {
                     res.send(err)
                 } else {

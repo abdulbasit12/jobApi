@@ -36,15 +36,7 @@ app.use(cors())
 app.use(express.static('./public'))
 
 
-
-
-
-app.get('/push', () => {
-
-})
-
 //Bring in Model
-let Article = require('./models/article');
 let Job = require('./models/job');
 let Department = require('./models/department');
 let User = require('./models/user');
@@ -181,12 +173,10 @@ app.get('/', function (req, res, next) {
 
 
 //route files
-let articles = require('./routes/articles');
 let users = require('./routes/users');
 let jobs = require('./routes/jobs');
 let departments = require('./routes/departments');
 let feedbacks = require('./routes/feedbacks');
-app.use('/articles', articles);
 app.use('/users', users);
 app.use('/jobs', jobs);
 app.use('/departments', departments);

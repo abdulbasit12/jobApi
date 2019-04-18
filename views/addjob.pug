@@ -2,45 +2,47 @@ extends layout
 
 block content
     h1 #{title}
-    form(method='POST', action='/jobs/job')
-        #form-group
-            label Job Name:
-            input.form-control(name='jobname', type='text')
-        #form-group
-            label Department:
-            select.form-control(name='departmentId')
-                option(hidden='hidden') Select Department
-                each a, i in dept
-                    option= a.deptname
-        #form-group
-            label Building:
-            input.form-control(name='building', type='text')
-        #form-group
-            label Floor:
-            input.form-control(name='floor', type='number')
-        #form-group
-            label Room:
-            input.form-control(name='room', type='number')
-        #form-group
-            label Specific Instruction:
-            input.form-control(name='instructions', type='text')
-        #form-group
-            label Priority:
-            input.form-control(name='priority', type='text')
-        #form-group
-            label Deadline:
-            input.form-control(name='deadline', type='date')
-        #form-group
-            label Status:
-            input.form-control(name='filestatus', type='text' value="Pending" disabled="disabled")
-        #form-group
-            label Creater Name:
-            input.form-control(name='creatername', readonly='readonly', type='text', value=user.name)
-        #form-group
-            label Worker Name:
-            select.form-control(name='workername')
-                option(hidden='hidden') Select Worker Name
-                option= user.name
-                //- each a in user
+    form(method='POST', action='/jobs/upload', enctype='multipart/form-data')
+        .form-group
+            input(type='file', name='myImage')
+        //- #form-group
+        //-     label Job Name:
+        //-     input.form-control(name='jobname', type='text')
+        //- #form-group
+        //-     label Department:
+        //-     select.form-control(name='departmentId')
+        //-         option(hidden='hidden') Select Department
+        //-         each a, i in dept
+        //-             option= a.deptname
+        //- #form-group
+        //-     label Building:
+        //-     input.form-control(name='building', type='text')
+        //- #form-group
+        //-     label Floor:
+        //-     input.form-control(name='floor', type='number')
+        //- #form-group
+        //-     label Room:
+        //-     input.form-control(name='room', type='number')
+        //- #form-group
+        //-     label Specific Instruction:
+        //-     input.form-control(name='instructions', type='text')
+        //- #form-group
+        //-     label Priority:
+        //-     input.form-control(name='priority', type='text')
+        //- #form-group
+        //-     label Deadline:
+        //-     input.form-control(name='deadline', type='date')
+        //- #form-group
+        //-     label Status:
+        //-     input.form-control(name='filestatus', type='text' value="Pending" disabled="disabled")
+        //- #form-group
+        //-     label Creater Name:
+        //-     input.form-control(name='creatername', readonly='readonly', type='text', value=user.name)
+        //- #form-group
+        //-     label Worker Name:
+        //-     select.form-control(name='workername')
+        //-         option(hidden='hidden') Select Worker Name
+        //-         option= user.name
+        //-         //- each a in user
         br
         input.btn.btn-primary(type='submit', value='Submit')

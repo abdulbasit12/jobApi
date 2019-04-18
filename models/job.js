@@ -47,6 +47,10 @@ let jobSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    img: {
+        data: Buffer,
+        contentType: String
+    }
 });
 let Job = mongoose.model('Job', jobSchema);
 module.exports = Job;
