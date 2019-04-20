@@ -2,7 +2,7 @@ extends layout
 
 block content
     h1 #{title}
-    form(method='POST', action='/jobs/upload', enctype='multipart/form-data')
+    form(method='POST', action='/jobs/job' enctype='multipart/form-data')
         .form-group
             input(type='file', name='myImage')
         //- #form-group
@@ -37,12 +37,12 @@ block content
         //-     input.form-control(name='filestatus', type='text' value="Pending" disabled="disabled")
         //- #form-group
         //-     label Creater Name:
-        //-     input.form-control(name='creatername', readonly='readonly', type='text', value=user.name)
+        //-     input.form-control(name='creatername', type='text')
         //- #form-group
         //-     label Worker Name:
         //-     select.form-control(name='workername')
         //-         option(hidden='hidden') Select Worker Name
-        //-         option= user.name
+        //-         option worker name
         //-         //- each a in user
         br
         input.btn.btn-primary(type='submit', value='Submit')

@@ -23,36 +23,39 @@ const storage = multer.diskStorage({
 
 //Init Upload
 const upload = multer({
-    storage : storage,
-    limits: {fileSize: 1000000},
+    storage: storage,
+    limits: { fileSize: 1000000 },
     fileFilter: (req, file, callback) => {
         checkFileType(file, callback)
     }
-}).single('myImage');
-
+})
+// .single('myImage');
 checkFileType = (file, callback) => {
     const fileType = /jpeg|jpg|png|gif/;
     const extname = fileType.test(path.extname(file.originalname).toLowerCase());
     const mimetype = fileType.test(file.mimetype);
-    if(mimetype && extname){
+    if (mimetype && extname) {
         return callback(null, true)
     } else {
         callback('Error: Images Only!')
     }
 }
 
-// router.post('/upload', (req, res) => {
-//     upload(req, res, (err) => {
-//         if(err){
-//             res.send(err)
-//         } else if(req.file == undefined){
-//             res.send({message: 'select image'});
-//         } else{
-//             console.log(req.file.path)
-//             res.send({message: 'success', file : `uploads/${req.file.filename}`})
-//         }
-//     })
-// })
+router.post('/upload', upload.single('img'), (req, res) => {
+    // upload(req, res, (err) => {
+    //     if(err){
+    //         res.send(err)
+    //     } else if(req.file == undefined){
+    //         res.send({message: 'select image'});
+    //     } else{
+    //         console.log(req.file.path)
+    //         res.send({message: 'success', file : `uploads/${req.file.filename}`})
+    //     }
+    // })
+    res.json({ file: req.file.path })
+    console.log(req.file.path);
+
+})
 
 //Init Firebase
 firebase.initializeApp({
@@ -60,23 +63,23 @@ firebase.initializeApp({
     databaseURL: "https://jobapi-ae2a1.firebaseio.com"
 });
 
-// router.get('/job', function (req, res) {
-//     Department.find({}, function (err, dept) {
-//         if (err) {
-//             res.send(err);
-//         } else {
-//             res.render('addjob', {
-//                 title: 'Create Job',
-//                 dept: dept,
-//                 // user: user
-//             })
-//         }
-//     })
-// });
+router.get('/job', function (req, res) {
+    Department.find({}, function (err, dept) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.render('addjob', {
+                title: 'Create Job',
+                dept: dept,
+                // user: user
+            })
+        }
+    })
+});
 
 
 //Submit Form
-router.post('/job', function (req, res) {
+router.post('/job', upload.single('img'), function (req, res) {
     // req.checkBody('jobname', 'Job Name is required').notEmpty();
     // req.checkBody('departmentId', 'Department is required').notEmpty();
     // req.checkBody('building', 'Building is required').notEmpty();
@@ -96,19 +99,7 @@ router.post('/job', function (req, res) {
     //         errors: errors
     //     })
     // } else {}
-    // upload(req, res, (err) => {
-    //     if(err){
-    //         res.send(err)
-    //     } else if(req.file == undefined){
-    //         res.send({message: 'select image'});
-    //     } else{
-    //         var imgPath = req.file.path;
-    //         res.send({message: 'success', file : `uploads/${req.file.filename}`})
-    //     }
-    // })
-
-    let job = new Job(req.body);
-    // Job.img.data = fs.readFileSync(imgPath)
+    let job = new Job({ ...req.body, imgpath: req.file.path });
     job.save(function (err, postedJob) {
         if (err) {
             console.log(err);
@@ -133,7 +124,6 @@ router.post('/job', function (req, res) {
                 .catch((err) => {
                     console.log('error:', err);
                 });
-
             res.send({ message: 'success', jobId: postedJob })
         }
     })
@@ -268,13 +258,13 @@ router.delete('/:id', function (req, res) {
 //View Job
 router.get('/:id', function (req, res) {
     Job.findById(req.params.id, function (err, jobs) {
-        console.log(jobs);
         if (err) {
             res.send(err);
         } else {
-            res.render('job', {
-                jobs: jobs
-            });
+            const query = { 'name': jobs.workername }
+            User.findOne(query, { phone: true, email: true, profession: true }, (err, user) => {
+                res.json({ user, jobs })
+            })
         }
     });
 })
@@ -282,65 +272,17 @@ router.get('/:id', function (req, res) {
 
 //view pending, completed, started, accepted, canceled jobs
 router.get('/', (req, res) => {
-    var locals = [];
-    var jobStatus = [
-        (callback) => {
-            Job.find({}).sort({deadline: 1}).exec((err, pendingJob) => {
-                if (err) {
-                    res.send({ message: 'failed' })
-                } else {
-                    var pending = lodash.filter(pendingJob, x => x.filestatus === 'pending')
-                    locals.pending = pending;
-                    callback();
-                }
-            })
-        },
-        (callback) => {
-            Job.find({}).sort({deadline: 1}).exec((err, completedJob) => {
-                if (err) {
-                    res.send(err)
-                } else {
-                    var completed = lodash.filter(completedJob, x => x.filestatus === 'completed')
-                    locals.completed = completed;
-                    callback();
-                }
-            })
-        },
-        (callback) => {
-            Job.find({}).sort({deadline: 1}).exec((err, otherJob) => {
-                if (err) {
-                    res.send(err)
-                } else {
-                    var open = lodash.filter(otherJob, x => x.filestatus === 'started' || x.filestatus === 'accepted')
-                    locals.open = open;
-                    callback();
-                }
-            })
-        },
-        (callback) => {
-            Job.find({}).sort({deadline: 1}).exec((err, canceled) => {
-                if (err) {
-                    res.send(err)
-                } else {
-                    var canceled = lodash.filter(canceled, x => x.filestatus === 'canceled')
-                    locals.canceled = canceled;
-                    callback();
-                }
-            })
-        }
-    ];
-    async.parallel(jobStatus, (err) => {
+    Job.find({}).sort({ deadline: 1 }).exec((err, pendingJob) => {
         if (err) {
-            res.send(err)
+            res.send({ message: 'failed' })
         } else {
-            res.send({ pending: locals.pending, completed: locals.completed, open: locals.open, canceled: locals.canceled })
+            var pending = lodash.filter(pendingJob, x => x.filestatus === 'pending')
+            var completed = lodash.filter(pendingJob, x => x.filestatus === 'completed')
+            var open = lodash.filter(pendingJob, x => x.filestatus === 'started' || x.filestatus === 'accepted')
+            var canceled = lodash.filter(pendingJob, x => x.filestatus === 'canceled')
+            res.send({ pending, completed, open, canceled })
         }
     })
-})
-
-//Update job Status
-router.post(':id', (req, res) => {
-
 })
 
 module.exports = router;

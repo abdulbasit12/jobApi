@@ -45,11 +45,9 @@ let jobSchema = mongoose.Schema({
     },
     workername:{
         type: String,
-        required: true
     },
-    img: {
-        data: Buffer,
-        contentType: String
+    imgpath: {
+        type: String,
     }
 });
 let Job = mongoose.model('Job', jobSchema);

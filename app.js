@@ -13,7 +13,7 @@ const lodash = require('lodash');
 
 
 //mongodb connection
-mongoose.connect(config.database, { useNewUrlParser: true });
+mongoose.connect(config.database, { useNewUrlParser: true, 'useCreateIndex': true });
 let db = mongoose.connection;
 
 //Check connection
