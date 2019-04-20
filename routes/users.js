@@ -11,7 +11,7 @@ let Department = require('../models/department');
 
 
 // Register Form
-router.get('/register', function(req, res){
+router.get('/register', function (req, res) {
     Department.find({}, function (err, dept) {
         if (err) {
             res.send(err);
@@ -25,57 +25,59 @@ router.get('/register', function(req, res){
 });
 
 // Register Process
-router.post('/register', function(req, res){
-    req.checkBody('name', 'Name is required').notEmpty();
-    req.checkBody('email', 'Email is required').notEmpty();
-    req.checkBody('email', 'Email is not Valid').isEmail();
-    req.checkBody('username', 'Username is required').notEmpty();
-    req.checkBody('gender', 'Gender is required').notEmpty();
-    req.checkBody('phone', 'Phone No is required').notEmpty();
-    req.checkBody('profession', 'Profession is required').notEmpty();
-    req.checkBody('role', 'Role is required').notEmpty();
-    req.checkBody('password', 'Password is required').notEmpty();
-    req.checkBody('password2', 'Confirm password is required').notEmpty();
-    req.checkBody('password2', 'Confirm password do not matche to password').equals(req.body.password);
-
-    let errors = req.validationErrors();
-    if(errors){
-        res.send({errors: errors});
-    } else {
-        let newUser = new User(req.body);
-        bcrypt.genSalt(10, function(err, salt){
-            bcrypt.hash(newUser.password, salt, function(err, hash){
-                if(err){
-                    console.log(err);
-                }
-                newUser.password = hash;
-                newUser.save(function(err){
-                    if(err){
+router.post('/register', function (req, res) {
+    // req.checkBody('name', 'Name is required').notEmpty();
+    // req.checkBody('email', 'Email is required').notEmpty();
+    // req.checkBody('email', 'Email is not Valid').isEmail();
+    // req.checkBody('username', 'Username is required').notEmpty();
+    // req.checkBody('gender', 'Gender is required').notEmpty();
+    // req.checkBody('phone', 'Phone No is required').notEmpty();
+    // req.checkBody('profession', 'Profession is required').notEmpty();
+    // req.checkBody('role', 'Role is required').notEmpty();
+    // req.checkBody('password', 'Password is required').notEmpty();
+    // req.checkBody('password2', 'Confirm password is required').notEmpty();
+    // req.checkBody('password2', 'Confirm password do not matche to password').equals(req.body.password);
+    const { email, name } = req.body;
+    User.findOne({ email, name }, (err, user) => {
+        if (user) {
+            return res.json({ message: 'User Already Exists' })
+        } else {
+            let newUser = new User(req.body);
+            bcrypt.genSalt(10, function (err, salt) {
+                bcrypt.hash(newUser.password, salt, function (err, hash) {
+                    if (err) {
                         console.log(err);
-                        return;
-                    } else{
-                        req.flash('success', 'You are now registered and can login');
-                        // res.redirect('/users/login')
-                        res.send({message: 'you are registered'});
                     }
+                    newUser.password = hash;
+                    newUser.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            return;
+                        } else {
+                            res.send({ message: 'you are registered' });
+                            //req.flash('success', 'You are now registered and can login');
+                            // res.redirect('/users/login')
+                        }
+                    });
                 });
             });
-        });
-    }
+        }
+    })
+
 });
 
 // Login form
-router.get('/login', function(req, res){
+router.get('/login', function (req, res) {
     res.render('login');
 });
 
 // get users
-router.get('/userList', (req,res,next) => {
+router.get('/userList', (req, res, next) => {
     User.find({}, (err, user) => {
-        if(err){
+        if (err) {
             res.send(err)
         } else {
-            res.send({message: 'success', user:user})
+            res.send({ message: 'success', user: user })
         }
     })
 })
@@ -83,23 +85,23 @@ router.get('/userList', (req,res,next) => {
 //load edit form
 router.get('/edit/:id', (req, res) => {
     User.findById(req.params.id, (err, user) => {
-        if(err){
+        if (err) {
             res.send(err);
         } else {
-            res.send({message: 'success', user: user})
+            res.send({ message: 'success', user: user })
         }
     })
 })
 
 //update edit form
-router.post('/edit/:id', (req,res) => {
+router.post('/edit/:id', (req, res) => {
     let user = req.body;
-    let query = {_id: req.params.id}
+    let query = { _id: req.params.id }
     User.updateOne(query, user, (err) => {
-        if(err){
+        if (err) {
             res.send(err)
-        } else{
-            res.send({message: 'success'})
+        } else {
+            res.send({ message: 'success' })
         }
     })
 
@@ -107,32 +109,32 @@ router.post('/edit/:id', (req,res) => {
 
 //Delete user
 router.delete('/:id', (req, res) => {
-    let query = {_id:req.params.id}
-    User.findById(req.params.id, () =>{
+    let query = { _id: req.params.id }
+    User.findById(req.params.id, () => {
         User.remove(query, (err) => {
-            if(err){
-                res.send({message: 'failed'})
-            } else{
-                res.send({message: 'success'})
+            if (err) {
+                res.send({ message: 'failed' })
+            } else {
+                res.send({ message: 'success' })
             }
         })
     })
 })
 
 //Login Process
-router.post('/login', function(req, res, next){
+router.post('/login', function (req, res, next) {
     passport.authenticate('local', (err, user) => {
-        if(err) {
+        if (err) {
             return next(err);
         }
-        if(!user) {
-            return res.send({message: 'Not a user'});
+        if (!user) {
+            return res.send({ message: 'Not a user' });
         }
-        req.logIn(user, function(err){
-            if(err) {
-                return res.send({message: 'fail'});
+        req.logIn(user, function (err) {
+            if (err) {
+                return res.send({ message: 'fail' });
             }
-            return res.send({message:'success', role: user.role, userId: user._id, profession: user.profession})
+            return res.send({ message: 'success', role: user.role, userId: user._id, profession: user.profession })
         })
     })(req, res, next);
 })
@@ -171,18 +173,18 @@ router.post('/login', function(req, res, next){
 // });
 
 //Logout
-router.get('/logout', function(req, res){
+router.get('/logout', function (req, res) {
     req.logout();
     //req.flash('success', 'You are logged out');
-    res.send({message: 'success'})
+    res.send({ message: 'success' })
 })
 
 // View user profile
-router.get('/:id', function(req, res){
-    Job.find({}, function(err, createdjobs){
-        res.render('user_profile',{
-            job_created:'Your Created Jobs',
-            task:'Your Tasks',
+router.get('/:id', function (req, res) {
+    Job.find({}, function (err, createdjobs) {
+        res.render('user_profile', {
+            job_created: 'Your Created Jobs',
+            task: 'Your Tasks',
             createdjobs: createdjobs
         });
     })

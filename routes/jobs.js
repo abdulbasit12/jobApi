@@ -270,7 +270,7 @@ router.get('/:id', function (req, res) {
 })
 
 
-//view pending, completed, started, accepted, canceled jobs
+//view pending, completed, started, accepted, canceled jobs, and department Jobs
 router.get('/', (req, res) => {
     Job.find({}).sort({ deadline: 1 }).exec((err, pendingJob) => {
         if (err) {
@@ -284,5 +284,7 @@ router.get('/', (req, res) => {
         }
     })
 })
+
+//view jobs on the basis of department
 
 module.exports = router;
