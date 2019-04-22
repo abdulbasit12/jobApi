@@ -181,12 +181,8 @@ router.get('/logout', function (req, res) {
 
 // View user profile
 router.get('/:id', function (req, res) {
-    Job.find({}, function (err, createdjobs) {
-        res.render('user_profile', {
-            job_created: 'Your Created Jobs',
-            task: 'Your Tasks',
-            createdjobs: createdjobs
-        });
+    User.findById(req.params.id, function (err, user) {
+        res.send({user})
     })
 })
 

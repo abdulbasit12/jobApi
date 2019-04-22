@@ -79,7 +79,8 @@ router.get('/job', function (req, res) {
 
 
 //Submit Form
-router.post('/job', upload.single('img'), function (req, res) {
+// upload.single('img'),
+router.post('/job',  function (req, res) {
     // req.checkBody('jobname', 'Job Name is required').notEmpty();
     // req.checkBody('departmentId', 'Department is required').notEmpty();
     // req.checkBody('building', 'Building is required').notEmpty();
@@ -99,7 +100,8 @@ router.post('/job', upload.single('img'), function (req, res) {
     //         errors: errors
     //     })
     // } else {}
-    let job = new Job({ ...req.body, imgpath: req.file.path });
+    //let job = new Job({ ...req.body, imgpath: req.file.path });
+    let job = new Job(req.body)
     job.save(function (err, postedJob) {
         if (err) {
             console.log(err);
