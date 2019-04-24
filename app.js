@@ -181,6 +181,9 @@ app.use('/users', users);
 app.use('/jobs', jobs);
 app.use('/departments', departments);
 app.use('/feedbacks', feedbacks);
+app.use('/buildings', require('./routes/buildings'));
+app.use('/floors', require('./routes/floors'));
+app.use('/rooms', require('./routes/rooms'));
 
 // Start Server
 app.listen(5000, function () {

@@ -63,36 +63,23 @@ firebase.initializeApp({
     databaseURL: "https://jobapi-ae2a1.firebaseio.com"
 });
 
-router.get('/job', function (req, res) {
-    Department.find({}, function (err, dept) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.render('addjob', {
-                title: 'Create Job',
-                dept: dept,
-                // user: user
-            })
-        }
-    })
-});
+// router.get('/job', function (req, res) {
+//     Department.find({}, function (err, dept) {
+//         if (err) {
+//             res.send(err);
+//         } else {
+//             res.render('addjob', {
+//                 title: 'Create Job',
+//                 dept: dept,
+//                 // user: user
+//             })
+//         }
+//     })
+// });
 
-
+//  upload.single('img'),
 //Submit Form
-// upload.single('img'),
-router.post('/job',  function (req, res) {
-    // req.checkBody('jobname', 'Job Name is required').notEmpty();
-    // req.checkBody('departmentId', 'Department is required').notEmpty();
-    // req.checkBody('building', 'Building is required').notEmpty();
-    // req.checkBody('floor', 'Floor is required').notEmpty();
-    // req.checkBody('room', 'Room is required').notEmpty();
-    // req.checkBody('instructions', 'Specific info is required').notEmpty();
-    // req.checkBody('priority', 'Priority is required').notEmpty();
-    // req.checkBody('deadline', 'Deadline is required').notEmpty();
-    // req.checkBody('filestatus', 'File Status is required').notEmpty();
-    // req.checkBody('creatername', 'Creater Name is required').notEmpty();
-    // req.checkBody('workername', 'Worker Name is required').notEmpty();
-
+router.post('/job', function (req, res) {
     //let errors = req.validationErrors();
     // if (errors) {
     //     res.render('addjob', {
@@ -100,6 +87,7 @@ router.post('/job',  function (req, res) {
     //         errors: errors
     //     })
     // } else {}
+    //console.log(req.file.path)
     //let job = new Job({ ...req.body, imgpath: req.file.path });
     let job = new Job(req.body)
     job.save(function (err, postedJob) {

@@ -20,7 +20,7 @@ router.post('/add', function(req, res){
         if(err){
             res.send(err);
         } else{
-            req.flash('success', 'Department added successfully');
+            //req.flash('success', 'Department added successfully');
             res.send({message: 'success'})
         }
     })
