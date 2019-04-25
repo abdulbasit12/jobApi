@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const passport = require('passport');
+const lodash = require('lodash');
 
 //Bring User Model
 let User = require('../models/user');
@@ -10,33 +10,8 @@ let Job = require('../models/job');
 let Department = require('../models/department');
 
 
-// Register Form
-router.get('/register', function (req, res) {
-    Department.find({}, function (err, dept) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.render('register', {
-                dept: dept,
-                // user: user
-            })
-        }
-    })
-});
-
 // Register Process
 router.post('/register', function (req, res) {
-    // req.checkBody('name', 'Name is required').notEmpty();
-    // req.checkBody('email', 'Email is required').notEmpty();
-    // req.checkBody('email', 'Email is not Valid').isEmail();
-    // req.checkBody('username', 'Username is required').notEmpty();
-    // req.checkBody('gender', 'Gender is required').notEmpty();
-    // req.checkBody('phone', 'Phone No is required').notEmpty();
-    // req.checkBody('profession', 'Profession is required').notEmpty();
-    // req.checkBody('role', 'Role is required').notEmpty();
-    // req.checkBody('password', 'Password is required').notEmpty();
-    // req.checkBody('password2', 'Confirm password is required').notEmpty();
-    // req.checkBody('password2', 'Confirm password do not matche to password').equals(req.body.password);
     const { email, name } = req.body;
     User.findOne({ email, name }, (err, user) => {
         if (user) {
@@ -55,8 +30,6 @@ router.post('/register', function (req, res) {
                             return;
                         } else {
                             res.send({ message: 'you are registered' });
-                            //req.flash('success', 'You are now registered and can login');
-                            // res.redirect('/users/login')
                         }
                     });
                 });
@@ -139,62 +112,82 @@ router.post('/login', function (req, res, next) {
     })(req, res, next);
 })
 
-// passport.authenticate('local', 
-//     {
-//         successRedirect: '/',
-//         failureRedirect: '/login',
-//         failureFlash: true
-//     })(req, res, next);
-
-// router.post('/', verifyToken, (req, res) =>{
-//     jwt.verify(req.token, 'secretkey', (err, authData) => {
-//         if(err){
-//             res.sendStatus(403);
-//         } else{
-//             res.json({
-//                 message: 'post created',
-//                 authData
-//             })
-//         }
-//     })
-// })
-
-// router.post('/login', function(req, res){
-//     User.find({}, (err, user) => {
-//         if(err){
-//             res.sendStatus(403);
-//         } else{
-//             jwt.sign({user}, 'secretkey', (err, token) => {
-//                 console.log(user);
-//                 res.render('index');
-//             })
-//         }
-//     })
-// });
-
 //Logout
 router.get('/logout', function (req, res) {
     req.logout();
-    //req.flash('success', 'You are logged out');
     res.send({ message: 'success' })
 })
 
 // View user profile
 router.get('/:id', function (req, res) {
     User.findById(req.params.id, function (err, user) {
-        res.send({user})
+        res.send({ user })
     })
 })
 
-// function verifyToken(req, res, next){
-//     const bearerHeader = req.headers['authorization'];
-//     if(typeof bearerHeader !== 'undefined'){
-//         const bearer = bearerHeader.split(' ');
-//         const bearerToken = bearer[1];
-//         req.token = bearerToken;
-//         next();
-//     } else{
-//         res.sendStatus(403);
-//     }
-// }
+//Change Password
+router.post('/changePass/:id', (req, res) => {
+    const { curPassword } = req.body;
+    User.findById(req.params.id, (err, user) => {
+        if (err) {
+            return res.json({ err })
+        } else {
+            bcrypt.compare(curPassword, user.password)
+                .then(isMatch => {
+                    if (!isMatch) {
+                        return res.json({ message: 'Current Password is not Correct' })
+                    } else {
+                        let user = new User(req.body);
+                        bcrypt.genSalt(10, (err, salt) => {
+                            bcrypt.hash(user.password, salt, (err, hash) => {
+                                if (err) {
+                                    res.json({ err })
+                                } else {
+                                    user.password = hash;
+                                    let query = { _id: req.params.id }
+                                    User.updateOne(query, { password: hash }, (err, test) => {
+                                        if (err) {
+                                            res.json({ err })
+                                        } else {
+                                            res.json({ message: 'Password Updated Successfully', test })
+                                        }
+                                    })
+                                }
+                            })
+                        })
+                    }
+                })
+        }
+    })
+})
+
+//reset password
+router.post('/resetPass/:id', (req, res) => {
+    User.findById(req.params.id, (err) => {
+        if(err) {
+            res.json({err})
+        } else {
+            var resetPass = '12345'
+            let user = new User(req.body)
+            bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(resetPass, salt, (err, hash) =>{
+                    if(err) {
+                        res.json({err})
+                    } else {
+                        resetPass = hash
+                        let query = {_id: req.params.id}
+                        User.updateOne(query, {password: hash}, (err, test) => {
+                            if(err) {
+                                res.json({err})
+                            } else {
+                                res.json({message: 'Reset Success', test})
+                            }
+                        })
+                    }
+                })
+            })
+        }
+    })
+})
+
 module.exports = router;
