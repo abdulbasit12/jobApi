@@ -50,7 +50,10 @@ router.get('/userList', (req, res, next) => {
         if (err) {
             res.send(err)
         } else {
-            res.send({ message: 'success', user: user })
+            var worker = lodash.filter(user, x => x.role == 'Worker')
+            var deptAdmin = lodash.filter(user, x => x.role == 'Department Admin')
+            var User = lodash.filter(user, x => x.role == 'User')
+            res.json({message:'success' ,worker, deptAdmin, User})
         }
     })
 })
