@@ -53,7 +53,7 @@ router.get('/userList', (req, res, next) => {
             var worker = lodash.filter(user, x => x.role == 'Worker')
             var deptAdmin = lodash.filter(user, x => x.role == 'Department Admin')
             var User = lodash.filter(user, x => x.role == 'User')
-            res.json({message:'success' ,worker, deptAdmin, User})
+            res.json({ message: 'success', worker, deptAdmin, User })
         }
     })
 })
@@ -167,27 +167,46 @@ router.post('/changePass/:id', (req, res) => {
 //reset password
 router.post('/resetPass/:id', (req, res) => {
     User.findById(req.params.id, (err) => {
-        if(err) {
-            res.json({err})
+        if (err) {
+            res.json({ err })
         } else {
             var resetPass = '12345'
             let user = new User(req.body)
             bcrypt.genSalt(10, (err, salt) => {
-                bcrypt.hash(resetPass, salt, (err, hash) =>{
-                    if(err) {
-                        res.json({err})
+                bcrypt.hash(resetPass, salt, (err, hash) => {
+                    if (err) {
+                        res.json({ err })
                     } else {
                         resetPass = hash
-                        let query = {_id: req.params.id}
-                        User.updateOne(query, {password: hash}, (err, test) => {
-                            if(err) {
-                                res.json({err})
+                        let query = { _id: req.params.id }
+                        User.updateOne(query, { password: hash }, (err, test) => {
+                            if (err) {
+                                res.json({ err })
                             } else {
-                                res.json({message: 'Reset Success', test})
+                                res.json({ message: 'Reset Success', test })
                             }
                         })
                     }
                 })
+            })
+        }
+    })
+})
+
+//view department users
+router.get('/dept_users/:id', (req, res) => {
+    User.find({}, (err, allUser) => {
+        if (err) {
+            res.sendStatus(404).json({ err })
+        } else {
+            User.findById(req.params.id, (err, loggedUser) => {
+                if(err) {
+                    res.sendStatus(404).json({ err })
+                } else {
+                    var deptWorker = lodash.filter(allUser, x => x.role == 'Worker' && x.profession == loggedUser.profession)
+                    var users = lodash.filter(allUser, x => x.role == 'User')
+                    res.json({deptWorker, users})
+                }
             })
         }
     })

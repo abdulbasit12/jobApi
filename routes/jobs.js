@@ -275,6 +275,20 @@ router.get('/', (req, res) => {
     })
 })
 
-//view jobs on the basis of department
+//view department jobs
+router.get('/dept_job/:id', (req, res) => {
+    Job.find({}, (err, jobs) => {
+        if(err) {
+            res.status(404).json({err})
+        } else {
+            User.findById(req.params.id, (err, user) => {
+                var deptJob = lodash.filter(jobs, x => x.departmentId == user.profession)
+                var pending = lodash.filter(jobs, x => x.filestatus == 'pending' && x.departmentId == user.profession)
+                var completed = lodash.filter(jobs, x => x.filestatus == 'completed' && x.departmentId == user.profession)
+                res.json({deptJob, pending, completed})
+            })
+        }
+    })
+})
 
 module.exports = router;
