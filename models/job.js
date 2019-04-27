@@ -16,7 +16,7 @@ let jobSchema = mongoose.Schema({
         required: true
     },
     room:{
-        type: Number,
+        type: String,
         required: true
     },
     floor:{
