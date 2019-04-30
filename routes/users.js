@@ -87,7 +87,7 @@ router.post('/edit/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
     let query = { _id: req.params.id }
     User.findById(req.params.id, () => {
-        User.remove(query, (err) => {
+        User.deleteOne(query, (err) => {
             if (err) {
                 res.send({ message: 'failed' })
             } else {

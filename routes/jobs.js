@@ -99,8 +99,8 @@ router.post('/job', function (req, res) {
             var topic = 'job_posted';
             var message = {
                 notification: {
-                    title: 'New Job Posted',
-                    body: 'Admin posted the new job'
+                    title: 'UIT',
+                    body: 'New job posted.'
                 },
                 data: {
                     'jobId': JobId
