@@ -53,7 +53,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //set public folder
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/public', express.static('public'));
 
 //Express session Middleware
 app.use(session({

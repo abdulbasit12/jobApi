@@ -29,7 +29,6 @@ const upload = multer({
         checkFileType(file, callback)
     }
 })
-// .single('myImage');
 checkFileType = (file, callback) => {
     const fileType = /jpeg|jpg|png|gif/;
     const extname = fileType.test(path.extname(file.originalname).toLowerCase());
@@ -41,59 +40,23 @@ checkFileType = (file, callback) => {
     }
 }
 
-router.post('/upload', upload.single('img'), (req, res) => {
-    // upload(req, res, (err) => {
-    //     if(err){
-    //         res.send(err)
-    //     } else if(req.file == undefined){
-    //         res.send({message: 'select image'});
-    //     } else{
-    //         console.log(req.file.path)
-    //         res.send({message: 'success', file : `uploads/${req.file.filename}`})
-    //     }
-    // })
-    res.json({ file: req.file.path })
-    console.log(req.file.path);
-
-})
-
 //Init Firebase
 firebase.initializeApp({
     credential: firebase.credential.cert(serviceAccount),
     databaseURL: "https://jobapi-ae2a1.firebaseio.com"
 });
-
-// router.get('/job', function (req, res) {
-//     Department.find({}, function (err, dept) {
-//         if (err) {
-//             res.send(err);
-//         } else {
-//             res.render('addjob', {
-//                 title: 'Create Job',
-//                 dept: dept,
-//                 // user: user
-//             })
-//         }
-//     })
-// });
-
-//  upload.single('img'),
 //Submit Form
-router.post('/job', function (req, res) {
-    //let errors = req.validationErrors();
-    // if (errors) {
-    //     res.render('addjob', {
-    //         title: 'Create Job',
-    //         errors: errors
-    //     })
-    // } else {}
-    //console.log(req.file.path)
-    //let job = new Job({ ...req.body, imgpath: req.file.path });
-    let job = new Job(req.body)
+router.post('/job', upload.single('img'), function (req, res) {
+    var job;
+    if (req.file) {
+        var path = req.file.destination + '/' + req.file.filename
+        job = new Job({ ...req.body, imgpath: path })
+    } else {
+        job = new Job({ ...req.body, imgpath: '' })
+    }
     job.save(function (err, postedJob) {
         if (err) {
-            console.log(err);
-            return;
+            res.send({ err })
         } else {
             var JobId = postedJob._id + '';
             var topic = 'job_posted';
@@ -278,14 +241,14 @@ router.get('/', (req, res) => {
 //view department jobs
 router.get('/dept_job/:id', (req, res) => {
     Job.find({}, (err, jobs) => {
-        if(err) {
-            res.status(404).json({err})
+        if (err) {
+            res.status(404).json({ err })
         } else {
             User.findById(req.params.id, (err, user) => {
                 var deptJob = lodash.filter(jobs, x => x.departmentId == user.profession)
                 var pending = lodash.filter(jobs, x => x.filestatus == 'pending' && x.departmentId == user.profession)
                 var completed = lodash.filter(jobs, x => x.filestatus == 'completed' && x.departmentId == user.profession)
-                res.json({deptJob, pending, completed})
+                res.json({ deptJob, pending, completed })
             })
         }
     })

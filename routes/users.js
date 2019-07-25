@@ -3,6 +3,8 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const lodash = require('lodash');
+const multer = require('multer');
+const path = require('path')
 
 //Bring User Model
 let User = require('../models/user');
@@ -10,14 +12,50 @@ let Job = require('../models/job');
 let Department = require('../models/department');
 
 
+//set storage engine
+const storage = multer.diskStorage({
+    destination: './public/uploads/profile Pictures',
+    filename: (req, file, callback) => {
+        callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+    }
+})
+
+//Init Upload
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 1000000 },
+    fileFilter: (req, file, callback) => {
+        checkFileType(file, callback)
+    }
+})
+checkFileType = (file, callback) => {
+    const fileType = /jpeg|jpg|png|gif/;
+    const extname = fileType.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = fileType.test(file.mimetype);
+    if (mimetype && extname) {
+        return callback(null, true)
+    } else {
+        callback('Error: Images Only!')
+    }
+}
+
 // Register Process
-router.post('/register', function (req, res) {
+router.post('/register', upload.single('profilePicture'), function (req, res) {
     const { email, name } = req.body;
     User.findOne({ email, name }, (err, user) => {
+        if (err) {
+            return res.status(422).json({ err })
+        }
         if (user) {
             return res.json({ message: 'User Already Exists' })
         } else {
-            let newUser = new User(req.body);
+            var newUser
+            if (req.file) {
+                var path = req.file.destination + '/' + req.file.filename
+                newUser = new User({ ...req.body, profilePicture: path });
+            } else {
+                newUser = new User(req.body);
+            }
             bcrypt.genSalt(10, function (err, salt) {
                 bcrypt.hash(newUser.password, salt, function (err, hash) {
                     if (err) {
@@ -39,10 +77,10 @@ router.post('/register', function (req, res) {
 
 });
 
-// Login form
-router.get('/login', function (req, res) {
-    res.render('login');
-});
+// // Login form
+// router.get('/login', function (req, res) {
+//     res.render('login');
+// });
 
 // get users
 router.get('/userList', (req, res, next) => {
@@ -104,11 +142,11 @@ router.post('/login', function (req, res, next) {
             return next(err);
         }
         if (!user) {
-            return res.send({ message: 'Not a user' });
+            return res.status(404).send({ message: 'Not a user' });
         }
         req.logIn(user, function (err) {
             if (err) {
-                return res.send({ message: 'fail' });
+                return res.status(422).send({ message: 'fail' });
             }
             return res.send({ message: 'success', role: user.role, userId: user._id, profession: user.profession })
         })
@@ -200,12 +238,12 @@ router.get('/dept_users/:id', (req, res) => {
             res.sendStatus(404).json({ err })
         } else {
             User.findById(req.params.id, (err, loggedUser) => {
-                if(err) {
+                if (err) {
                     res.sendStatus(404).json({ err })
                 } else {
                     var deptWorker = lodash.filter(allUser, x => x.role == 'Worker' && x.profession == loggedUser.profession)
                     var users = lodash.filter(allUser, x => x.role == 'User')
-                    res.json({deptWorker, users})
+                    res.json({ deptWorker, users })
                 }
             })
         }

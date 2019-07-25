@@ -9,6 +9,10 @@ const floorSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    siteMap: {
+        type: String,
+        required: true
+    }
 })
 
 let Floor = mongoose.model('Floor', floorSchema);
