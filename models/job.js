@@ -48,6 +48,10 @@ let jobSchema = mongoose.Schema({
     },
     imgpath: {
         type: String,
+    },
+    createrId:{
+        type: String,
+        required: true
     }
 });
 let Job = mongoose.model('Job', jobSchema);

@@ -5,80 +5,84 @@ const router = express.Router();
 let Department = require('../models/department');
 
 //Load Add Form
-router.get('/add', function(req, res){
-    res.render('add_dept', {
-        title:'Add Department'
-    })
-})
+// router.get('/add', function (req, res) {
+//     res.render('add_dept', {
+//         title: 'Add Department'
+//     })
+// })
 
 //Submit Form
-router.post('/add', function(req, res){
-    req.checkBody('deptId', 'Department ID is required').notEmpty();
+router.post('/add', function (req, res) {
     req.checkBody('deptname', 'Department Name is required').notEmpty();
-    let department = new Department(req.body);
-    department.save(function(err){
-        if(err){
-            res.send(err);
-        } else{
-            //req.flash('success', 'Department added successfully');
-            res.send({message: 'success'})
-        }
-    })
+    Department.find({})
+        .then((deparment) => {
+            var deptId = deparment.length + 1
+            let department = new Department({ ...req.body, deptId: deptId });
+            department.save(function (err) {
+                if (err) {
+                    res.status(422).json({ error: err });
+                } else {
+                    res.json({ message: 'success' })
+                }
+            })
+        }).catch(err => {
+            res.status(422).json({ error: err })
+        })
 })
 
 //Load Edit Form
-router.get('/edit/:id', function(req, res){
-    Department.findById(req.params.id, function(err, dept){
-        if(err){
+router.get('/edit/:id', function (req, res) {
+    Department.findById(req.params.id, function (err, dept) {
+        if (err) {
             res.send(err);
-        } else{
+        } else {
             // res.render('edit_dept', {
             //     title: 'Edit Department',
             //     dept: dept
             // })
-            res.send({message: 'success', dept : dept})
+            res.send({ message: 'success', dept: dept })
         }
     })
 });
 
 //Update Department
-router.post('/edit/:id', function(req, res){
+router.post('/edit/:id', function (req, res) {
     let dept = req.body;
-    let query = {_id:req.params.id}
-    Department.updateOne(query, dept, function(err){
-        if(err){
+    let query = { _id: req.params.id }
+    Department.updateOne(query, dept, function (err) {
+        if (err) {
             req.send(err)
-        } else{
+        } else {
             req.flash('success', 'deparment updated Successfully');
-            res.send({message: 'success'})
+            res.send({ message: 'success' })
         }
     })
 })
 
 //Delete Department
-router.delete('/:id', function(req,res){
-    let query = {_id:req.params.id}
-    Department.findById(req.params.id, function(){
-        Department.remove(query, function(err){
-            if(err){
+router.delete('/:id', function (req, res) {
+    let query = { _id: req.params.id }
+    Department.findById(req.params.id, function () {
+        Department.remove(query, function (err) {
+            if (err) {
                 res.send(err);
-            } else{
-                res.send({message: 'success'})
+            } else {
+                res.send({ message: 'success' })
             }
         })
     })
 })
 
 //View Departments
-router.get('/:id', function(req, res){
-    Department.findById(req.params.id, function(err, dept){
-        if(err){
+router.get('/:id', function (req, res) {
+    Department.findById(req.params.id, function (err, dept) {
+        if (err) {
             res.send(err);
-        } else{
+        } else {
             // res.render('department', {
             //     dept: dept
             // })
-            res.send({dept: dept})
+            res.send({ dept: dept })
         }
     })
 });

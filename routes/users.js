@@ -122,17 +122,27 @@ router.post('/edit/:id', (req, res) => {
 })
 
 //Delete user
-router.delete('/:id', (req, res) => {
-    let query = { _id: req.params.id }
-    User.findById(req.params.id, () => {
-        User.deleteOne(query, (err) => {
-            if (err) {
-                res.send({ message: 'failed' })
+router.delete('/:userId', (req, res) => {
+    User.find({ _id: req.params.userId })
+        .then((user) => {
+            if (user.length == 0) {
+                return res.status(404).json({ message: 'no user found to delete' })
             } else {
-                res.send({ message: 'success' })
+                User.deleteOne({ _id: req.params.userId })
+                    .then(() => {
+                        Job.deleteMany({ createrId: req.params.userId })
+                            .then(() => {
+                                res.json({ message: 'deleted' })
+                            }).catch(err => {
+                                res.status(422).json({ error: err })
+                            })
+                    }).catch(err => {
+                        res.status(422).json({ error: err })
+                    })
             }
+        }).catch(err => {
+            return res.status(422).json({ error: err })
         })
-    })
 })
 
 //Login Process
